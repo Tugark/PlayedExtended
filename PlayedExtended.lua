@@ -65,7 +65,7 @@ function PlaytimeExtended:UpdateTimePlayed(total, currentLevel)
     local charName = UnitName('player')	
     local realm = GetRealmName()
     local faction = UnitFactionGroup('player')
-    self.db['data'][charName] = AccountPlaytime:new(total, realm, faction)
+    self.db['data'][charName .. '__' .. realm] = AccountPlaytime:new(total, realm, faction, charName)
 end
 
 function PlaytimeExtended:CalculatePlaytimeResults()
@@ -114,10 +114,11 @@ end
     * total = Total playtime of the character in seconds
     * realm = The realm where the character is on
     * faction = The faction of the character
+    * charName = The name of the character
 --]]
 AccountPlaytime = {}
-function AccountPlaytime:new(total, realm, faction)
-    newAccountPlaytime = {total = total, realm = realm, faction = faction}
+function AccountPlaytime:new(total, realm, faction, charName)
+    newAccountPlaytime = {total = total, realm = realm, faction = faction, charName = charName}
     self.__index = self
     return setmetatable(newAccountPlaytime, self)
 end
