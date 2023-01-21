@@ -1,0 +1,8 @@
+## Interface: 100002
+## Version: 0.0.1
+## Title: PlayedExtended
+## Notes: Allows tracking of played across characters, factions and realms.
+## Author: Tugark
+## SavedVariables: PlayedExtendedDb
+
+PlayedExtended.lua
