@@ -16,13 +16,13 @@ local defaults = {
 
 -- Event Handlers and Initialization
 
-local PlaytimeExtended = CreateFrame('Frame')
+local PlayedExtended = CreateFrame('Frame')
 
-function PlaytimeExtended:OnEvent(event, ...)
+function PlayedExtended:OnEvent(event, ...)
 	self[event](self, event, ...)
 end
 
-function PlaytimeExtended:ADDON_LOADED(event, addOnName)
+function PlayedExtended:ADDON_LOADED(event, addOnName)
     if addOnName == 'PlayedExtended' then
         PlayedExtendedDb = PlayedExtendedDb or {}
         self.db = PlayedExtendedDb
@@ -35,40 +35,40 @@ function PlaytimeExtended:ADDON_LOADED(event, addOnName)
     end
 end
 
-function PlaytimeExtended:PLAYER_ENTERING_WORLD(event, isInitialLogin, isReload)
+function PlayedExtended:PLAYER_ENTERING_WORLD(event, isInitialLogin, isReload)
     if isInitialLogin then
         self:GetTimePlayedFromServer()
     end
 end
 
-function PlaytimeExtended:PLAYER_LOGOUT(event)
+function PlayedExtended:PLAYER_LOGOUT(event)
     self:GetTimePlayedFromServer()
 end
 
-function PlaytimeExtended:TIME_PLAYED_MSG(event, total, currentLevel)
+function PlayedExtended:TIME_PLAYED_MSG(event, total, currentLevel)
     self:UpdateTimePlayed(total, currentLevel)
 end
 
-PlaytimeExtended:RegisterEvent('ADDON_LOADED')
-PlaytimeExtended:RegisterEvent('PLAYER_ENTERING_WORLD')
-PlaytimeExtended:RegisterEvent('PLAYER_LOGOUT')
-PlaytimeExtended:RegisterEvent('TIME_PLAYED_MSG')
-PlaytimeExtended:SetScript('OnEvent', PlaytimeExtended.OnEvent)
+PlayedExtended:RegisterEvent('ADDON_LOADED')
+PlayedExtended:RegisterEvent('PLAYER_ENTERING_WORLD')
+PlayedExtended:RegisterEvent('PLAYER_LOGOUT')
+PlayedExtended:RegisterEvent('TIME_PLAYED_MSG')
+PlayedExtended:SetScript('OnEvent', PlayedExtended.OnEvent)
 
 -- Addon Code
 
-function PlaytimeExtended:GetTimePlayedFromServer()
+function PlayedExtended:GetTimePlayedFromServer()
     RequestTimePlayed()
 end
 
-function PlaytimeExtended:UpdateTimePlayed(total, currentLevel)
+function PlayedExtended:UpdateTimePlayed(total, currentLevel)
     local charName = UnitName('player')	
     local realm = GetRealmName()
     local faction = UnitFactionGroup('player')
     self.db['data'][charName .. '__' .. realm] = AccountPlaytime:new(total, realm, faction, charName)
 end
 
-function PlaytimeExtended:CalculatePlaytimeResults()
+function PlayedExtended:CalculatePlaytimeResults()
     local factionResults = {}
     for k, v in pairs(FACTIONS) do 
         factionResults[v] = PlaytimeStats:new()
@@ -92,9 +92,11 @@ function PlaytimeExtended:CalculatePlaytimeResults()
     return results
 end
 
-function PlaytimeExtended:DisplayPlayed()
-    local results = PlaytimeExtended:CalculatePlaytimeResults()
+function PlayedExtended:DisplayPlayed()
+    local results = PlayedExtended:CalculatePlaytimeResults()
 
+    print(' ')
+    print('|cff1e81b0====== PlayedExtended Report ======|r')
     print('Total played: ' .. GetPlayedInDaysMinutesSeconds(results['total']['time']) .. ' ('..results['total']['noOfChars']..' characters)')
     print('Total played per faction: ')
     for k, v in pairs(FACTIONS) do
@@ -104,6 +106,7 @@ function PlaytimeExtended:DisplayPlayed()
     for realm, realmData in pairs(results['perRealm']) do
         print('    ' .. realm .. ': ' .. GetPlayedInDaysMinutesSeconds(realmData['time']) .. ' ('..realmData['noOfChars']..' characters)')
     end
+    print(' ')
 end
 
 -- Classes
@@ -154,10 +157,10 @@ end
 function SlashHandler(msg, editbox)
     if msg == 'reset' then
         PlayedExtendedDb = {}
-        PlaytimeExtended:GetTimePlayedFromServer()
+        PlayedExtended:GetTimePlayedFromServer()
         print('PlayedExtended was reset!')
     else
-        PlaytimeExtended:DisplayPlayed()
+        PlayedExtended:DisplayPlayed()
     end
 end
 
